@@ -1,0 +1,27 @@
+{
+  "name": "jinx",
+  "version": "1.0.0",
+  "description": "Minimalist Web Server",
+  "main": "jinx.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hadenpike/jinx.git"
+  },
+  "keywords": [
+    "Minimal",
+    "Web",
+    "Server"
+  ],
+  "author": {
+    "name": "Haden Pike",
+    "email": "haden.pike@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hadenpike/jinx/issues"
+  },
+  "homepage": "https://github.com/hadenpike/jinx"
+}
