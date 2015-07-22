@@ -1,4 +1,9 @@
-var http = require('http'),
+/**
+    * Module dependencies.
+*/
+var fs = require('fs'),
+    http = require('http'),
+    path = require('path'),
     url = require('url');
 
 /**
@@ -18,6 +23,18 @@ var routes = {
 */
 function addHandler(method, path, handler) {
     routes[method][path] = handler;
+}
+
+/**
+    * Serve a static file.
+    *
+    * @param {String} filename
+    * @api public
+*/
+function serveStatic(res, filename) {
+    var fileToServe = path.join(__dirname, filename);
+    var stream = fs.createReadStream(fileToServe);
+    stream.pipe(res);
 }
 
 /**
@@ -81,7 +98,7 @@ exports = module.exports = Jinx;
 */
 if (require.main === module) {
     Jinx.get('/', function(req, res) {
-	res.end('Hello, World!');
+	serveStatic(res, 'test.html');
     });
     Jinx.start();
 }
