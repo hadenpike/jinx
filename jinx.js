@@ -36,7 +36,7 @@ Jinx.addHandler = function(method, path, handler) {
     * @param {String} filename
     * @api public
 */
-Jinx.serveStatic = function(res, filename) {
+Jinx.serveStatic = function(req, res, filename) {
     var fileToServe = path.join(__dirname, filename);
     var stream = fs.createReadStream(fileToServe);
     // Do not pipe the contents until the stream is open
@@ -45,7 +45,7 @@ Jinx.serveStatic = function(res, filename) {
     });
     // Handles errors when the stream is created
     stream.on('error', function(err) {
-	throw err;
+	Jinx.emit('error', req, res, err);
     });
 };
 
@@ -64,8 +64,13 @@ function onRequest(req, res) {
     if (typeof(handler) === 'function') {
 	return handler(req, res);
     }
-    this.serveStatic(res, pathname);
+    this.serveStatic(req, res, pathname);
 }
+
+Jinx.on('error',  function(req, res, err) {
+    res.writeHead(404, {'content-type': 'text/plain'});
+    res.end('404 Not Found');
+});
 
 /**
     * Convenience method for adding a get handler.
