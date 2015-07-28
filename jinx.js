@@ -39,7 +39,14 @@ Jinx.addHandler = function(method, path, handler) {
 Jinx.serveStatic = function(res, filename) {
     var fileToServe = path.join(__dirname, filename);
     var stream = fs.createReadStream(fileToServe);
-    stream.pipe(res);
+    // Do not pipe the contents until the stream is open
+    stream.on('open', function() {
+	stream.pipe(res);
+    });
+    // Handles errors when the stream is created
+    stream.on('error', function(err) {
+	throw err;
+    });
 };
 
 /**
@@ -52,15 +59,12 @@ Jinx.serveStatic = function(res, filename) {
 function onRequest(req, res) {
     var method = req.method.toLowerCase();
     var pathname = url.parse(req.url).pathname;
-    var handler = routes[method][pathname];
+    var handler = this.routes[method][pathname];
     console.log(method + ' ' + pathname);
     if (typeof(handler) === 'function') {
 	return handler(req, res);
     }
-    else {
-	res.writeHead(404, {'content-type': 'text/plain'});
-	res.end('404 Not Found');
-    }
+    this.serveStatic(res, pathname);
 }
 
 /**
@@ -96,7 +100,7 @@ Jinx.start = function() {
 */
 if (require.main === module) {
     Jinx.get('/', function(req, res) {
-	serveStatic(res, 'test.html');
+	Jinx.serveStatic(res, 'test.html');
     });
     Jinx.start();
 }
