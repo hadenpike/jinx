@@ -7,9 +7,14 @@ var fs = require('fs'),
     url = require('url');
 
 /**
+    * Expose the Jinx variable.
+*/
+var Jinx = exports = module.exports = http.createServer(onRequest);
+
+/**
     * Server routes.
 */
-var routes = {
+Jinx.routes = {
     'get': {}
 };
 
@@ -21,9 +26,9 @@ var routes = {
     * @param {function} handler
     * @api private
 */
-function addHandler(method, path, handler) {
-    routes[method][path] = handler;
-}
+Jinx.addHandler = function(method, path, handler) {
+    this.routes[method][path] = handler;
+};
 
 /**
     * Serve a static file.
@@ -31,11 +36,11 @@ function addHandler(method, path, handler) {
     * @param {String} filename
     * @api public
 */
-function serveStatic(res, filename) {
+Jinx.serveStatic = function(res, filename) {
     var fileToServe = path.join(__dirname, filename);
     var stream = fs.createReadStream(fileToServe);
     stream.pipe(res);
-}
+};
 
 /**
     * Route request to handler
@@ -50,15 +55,13 @@ function onRequest(req, res) {
     var handler = routes[method][pathname];
     console.log(method + ' ' + pathname);
     if (typeof(handler) === 'function') {
-	handler(req, res);
+	return handler(req, res);
     }
     else {
 	res.writeHead(404, {'content-type': 'text/plain'});
 	res.end('404 Not Found');
     }
-};
-
-var Jinx = http.createServer(onRequest);
+}
 
 /**
     * Convenience method for adding a get handler.
@@ -68,7 +71,7 @@ var Jinx = http.createServer(onRequest);
     * @api public
 */
 Jinx.get = function(path, handler) {
-    addHandler('get', path, handler);
+    this.addHandler('get', path, handler);
 };
 
 /**
@@ -84,11 +87,6 @@ Jinx.start = function() {
 	console.log('Server started!');
     });
 };
-
-/**
-    * Expose the Jinx variable.
-*/
-exports = module.exports = Jinx;
 
 /**
     * Run module directly.
