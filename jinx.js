@@ -1,6 +1,7 @@
 /**
     * Module dependencies.
 */
+
 var fs = require('fs'),
     http = require('http'),
     path = require('path'),
@@ -26,7 +27,7 @@ Jinx.routes = {
     * @param {function} handler
     * @api private
 */
-Jinx.addHandler = function(method, path, handler) {
+Jinx.addRoute = function(method, path, handler) {
     this.routes[method][path] = handler;
 };
 
@@ -62,7 +63,12 @@ function onRequest(req, res) {
     var handler = this.routes[method][pathname];
     console.log(method + ' ' + pathname);
     if (typeof(handler) === 'function') {
-	return handler(req, res);
+	try {
+	    return handler(req, res);
+	}
+	catch(err) {
+	    this.emit('error', req, res, err);
+	}
     }
     this.serveStatic(req, res, pathname);
 }
@@ -80,7 +86,7 @@ Jinx.on('error',  function(req, res, err) {
     * @api public
 */
 Jinx.get = function(path, handler) {
-    this.addHandler('get', path, handler);
+    this.addRoute('get', path, handler);
 };
 
 /**
@@ -105,7 +111,7 @@ Jinx.start = function() {
 */
 if (require.main === module) {
     Jinx.get('/', function(req, res) {
-	Jinx.serveStatic(res, 'test.html');
+	Jinx.serveStatic(req, res, 'test.html');
     });
     Jinx.start();
 }
