@@ -90,6 +90,26 @@ Jinx.get = function(path, handler) {
 };
 
 /**
+    * Default handler for the / route.
+*/
+Jinx.get('/', function(req, res) {
+    fs.readdir(__dirname, function(err, files) {
+	if (!files) {
+	    err = new Error("No files in directory");
+	}
+	if (err) {
+	    return this.emit('error', req, res, err);
+	}
+	var fileRegexp = /index.x*html*/;
+	for (var i = 0; i < files.length; ++ i) {
+	    if (files[i].match(fileRegexp)) {
+		return Jinx.serveStatic(req, res, files[i]);
+	    }
+	}
+    });
+});
+
+/**
     * Start the server.
     *
     * You can call listen instead of start,
@@ -110,8 +130,5 @@ Jinx.start = function() {
     * setup and run a basic server.
 */
 if (require.main === module) {
-    Jinx.get('/', function(req, res) {
-	Jinx.serveStatic(req, res, 'test.html');
-    });
     Jinx.start();
 }
