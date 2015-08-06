@@ -117,8 +117,9 @@ Jinx.get('/', function(req, res) {
     *
     * @api public
 */
-Jinx.start = function() {
-    this.listen(9999, function() {
+Jinx.start = function(port) {
+    port = port || 9999;
+    this.listen(port, function() {
 	console.log('Server started!');
     });
 };
