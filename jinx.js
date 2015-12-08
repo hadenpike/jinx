@@ -13,6 +13,11 @@ var fs = require('fs'),
 var Jinx = exports = module.exports = http.createServer(onRequest);
 
 /**
+    * The root directory of the server.
+*/
+Jinx.serverRoot = process.cwd();
+
+/**
     * Server routes.
 */
 Jinx.routes = {
@@ -38,7 +43,7 @@ Jinx.addRoute = function(method, path, handler) {
     * @api public
 */
 Jinx.serveStatic = function(req, res, filename) {
-    var fileToServe = path.join(__dirname, filename);
+    var fileToServe = path.join(this.serverRoot, filename);
     var stream = fs.createReadStream(fileToServe);
     // Do not pipe the contents until the stream is open
     stream.on('open', function() {
@@ -93,7 +98,7 @@ Jinx.get = function(path, handler) {
     * Default handler for the / route.
 */
 Jinx.get('/', function(req, res) {
-    fs.readdir(__dirname, function(err, files) {
+    fs.readdir(Jinx.serverRoot, function(err, files) {
 	if (!files) {
 	    err = new Error("No files in directory");
 	}
