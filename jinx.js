@@ -120,11 +120,12 @@ Jinx.get('/', function(req, res) {
     * You can call listen instead of start,
     * if you need to do anything special.
     *
+    * @param {int} port
     * @api public
 */
 Jinx.start = function(port) {
     port = port || 9999;
-    this.listen(port, function() {
+    return this.listen(port, function() {
 	console.log('Server started!');
     });
 };
